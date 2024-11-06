@@ -1,24 +1,24 @@
-#[Derive(Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct CommitmentParams {
     // amortized opening decomposition parts
-    func: u64,
+    pub func: u64,
     // uniform decomposition parts
-    func_u: u64,
+    pub func_u: u64,
     // quadratic garbage decomposition parts
-    func_g: u64,
+    pub func_g: u64,
     // amortized opening decomposition basis
-    basis: u64,
+    pub basis: u64,
     // uniform decomposition basis
-    basis_u: u64,
+    pub basis_u: u64,
     // quadrstic garbage decomposition basis
-    basis_g: u64,
+    pub basis_g: u64,
     // inner commitment rank
-    kappa_inner: u64,
+    pub kappa_inner: u64,
     // outer commitment rank
-    kappa_outer: u64,
+    pub kappa_outer: u64,
 }
 
-#[Derive(Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct Proof {
     // input witness multiplicity
     r: u64,
@@ -44,7 +44,34 @@ pub struct Proof {
     norm_sq: u64,
 }
 
-#[Derive(Debug, Clone)]
+impl Proof {
+    pub fn new() -> Self {
+        Proof {
+            r: 0,
+            n: 0,
+            n_u: 0,
+            is_tail: false,
+            commitment_params: CommitmentParams {
+                func: 0,
+                func_u: 0,
+                func_g: 0,
+                basis: 0,
+                basis_u: 0,
+                basis_g: 0,
+                kappa_inner: 0,
+                kappa_outer: 0,
+            },
+            commitment_outer_1: 0,
+            jl_nonce: 0,
+            vec_p: [0; 256],
+            bb: 0,
+            commitment_outer_2: 0,
+            norm_sq: 0,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct Statement {
     // total amortized multiplicity
     r: u64,
@@ -55,22 +82,22 @@ pub struct Statement {
     // true for no outer commitment
     is_tail: bool,
     // commitment parameters
-    commitment_params: Vec<CommitmentParams>,
+    pub commitment_params: Vec<CommitmentParams>,
     // outer commitment 1 (kappa1) or inner commitments (r*kappa) if tail
-    outer_commitment_1: u64, // TODO: change to the polynomial_ext type
+    pub outer_commitment_1: u64, // TODO: change to the polynomial_ext type
     // outer commitment 2 (kappa1) or garbage terms ((r*r+r)/2) if tail
-    outer_commitment_2: u64, // TODO: change to the polynomial_ext type
+    pub outer_commitment_2: u64, // TODO: change to the polynomial_ext type
     // challenges (r)
-    challenge: u64,
+    pub challenge: u64,
     // aggregated dot-product constraint
-    constraint: Constraint,
+    pub constraint: Constraint,
     // norm bound
-    beta_sq: u64,
+    pub beta_sq: u64,
     // hash
-    hash: [u8; 16],
+    pub hash: [u8; 16],
 }
 
-#[Derive(Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct Constraint {
     // extension degree
     deg_ext: u64,
@@ -80,7 +107,7 @@ pub struct Constraint {
     b: u64,      // TODO: change to the polynomial_ext type
 }
 
-#[Derive(Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct Witness {
     // witness multiplicity
     r: u64,

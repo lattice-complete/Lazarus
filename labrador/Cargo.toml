@@ -7,3 +7,6 @@ edition = "2018"
 name = "main"
 required_features = ["test"]
 path = "src/example/main.rs"
+
+[dependencies]
+rand = "0.8.5"

@@ -1,8 +1,9 @@
+use crate::structs::{Proof, Statement, Witness};
 // src/prover.rs
 
 pub fn setup() {
     // 0. setup
-    // public parameters after setup: [a_ij^(k), a_ij^(l), phi^(k), phi^(l), b^(k), b0(l)']
+    // public parameters after setup: [a_ij^(l), phi^(k), phi^(l), b^(k), b0(l)']
 
     // 1. setup constraints
     // 1.1 get s_i and do norm check
@@ -28,8 +29,21 @@ pub fn setup() {
     // L = |F'| = ceiling(128 / logQ)
 }
 
-pub fn prove() {
+pub fn init_proof(witness: &Witness, quadratic: u32, is_tail: bool) -> Proof {
+    Proof::new()
+}
+
+pub fn prove(
+    ost: Statement,
+    owt: Witness,
+    proof: Proof,
+    ist: Statement,
+    iwt: Witness,
+    is_tail: bool,
+) {
     println!("Proving something...");
+    let mut proof: Proof;
+    proof = init_proof(&iwt, 2, is_tail);
     // 2. GOAL: calculate ajtai commitment (1st outer commitment)
     // 2.1 split t to t_i for all i
     // 2.1.1 get basis b1, refer to paper page 16, labrador c code line 142
