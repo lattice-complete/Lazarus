@@ -7,3 +7,10 @@ edition = "2018"
 name = "main"
 required_features = ["test"]
 path = "src/example/main.rs"
+
+[dependencies]
+ndarray = "0.16.1"
+ndarray-rand = "0.15.0"
+rand = "0.8.5"
+lark_algebra = { git = "https://github.com/haopining/larkworks", branch = "main", package = "lark_algebra" }
+lark_crypto = { git = "https://github.com/haopining/larkworks", branch = "main", package = "lark_crypto_primitives" }
