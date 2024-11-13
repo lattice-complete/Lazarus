@@ -17,6 +17,22 @@ impl Distribution<i8> for PiDistribution {
     }
 }
 
+/// Projects a matrix of polynomial ring into a lower-dimensional space using a random projection.
+///
+/// Function Overview:
+/// - Input: A matrix `D` over a polynomial ring with dimensions `(rows, original_domain)`.
+/// - Output: A projected matrix `P` over the same polynomial ring with dimensions `(rows, target_domain)`.
+/// - Process:
+///   - Generate a random projection matrix `Π` of dimensions `(target_domain, original_domain)`.
+///     - Each entry in `Π` is a polynomial ring with coefficients randomly selected from the set `{ -1, 0, 1 }` with probabilities `{ 1/4, 1/2, 1/4 }` respectively.
+///   - Compute the projected matrix `P` by fot product `D` with `Π`
+/// - Property:
+///   - The L2 norms (Euclidean norms) of `D` and `P` are approximately preserved due to the Johnson-Lindenstrauss lemma.
+///
+/// Notes:
+/// - This technique is useful for dimensionality reduction while maintaining the structural integrity of the data.
+/// - The random projection is efficient and suitable for large-scale data processing in polynomial rings.
+
 pub fn jl_projection(
     data: Vec<Vec<RingGoldilock256>>,
     target_dim: usize,
@@ -26,6 +42,7 @@ pub fn jl_projection(
     for _ in 0..target_dim {
         let mut row: Vec<RingGoldilock256> = Vec::with_capacity(original_dim);
         for _ in 0..original_dim {
+            // generate random polynomial ring with coefficients from the set {-1, 0, 1}
             let mut poly: Vec<Goldilocks> = Vec::with_capacity(ConfigZZpXGoldilocks256::DIM);
             for _ in 0..ConfigZZpXGoldilocks256::DIM {
                 let cell = match PiDistribution.sample(&mut rand::thread_rng()) {
