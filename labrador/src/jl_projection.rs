@@ -59,9 +59,9 @@ pub fn jl_projection(
     }
 
     let mut projected_data = Vec::with_capacity(data.len());
-    for data_vec in data.clone() {
+    for data_vec in &data {
         let mut projected_vector: Vec<RingGoldilock256> = Vec::with_capacity(target_dim);
-        for projection_row in projection_matrix.clone() {
+        for projection_row in &projection_matrix {
             let projection_value = RingGoldilock256::dot_product(&data_vec, &projection_row);
             projected_vector.push(projection_value);
         }
