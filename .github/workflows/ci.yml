@@ -1,0 +1,37 @@
+name: Main Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150 # Consider increasing timeout
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+          components: clippy
+
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --all --verbose
+
+      - name: Test
+        run: cargo test --all --verbose

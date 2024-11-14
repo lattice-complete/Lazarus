@@ -74,6 +74,7 @@ Add Lazarus to your Cargo.toml:
 - [noble-post-quantum](https://github.com/paulmillr/noble-post-quantum) by paulmillr
 - [labrador](https://github.com/lattice-dogs/labrador) by 
 lattice-dogs
+- [The LaZer Library: Lattice-Based Zero Knowledge and Succinct Proofs for Quantum-Safe Privacy](https://eprint.iacr.org/2024/1846)
 - [arkworks](https://arkworks.rs/) 
 - [larkworks](https://github.com/zhenfeizhang/larkworks)
 - [LNP22] [Lattice-Based Zero-Knowledge Proofs and Applications:
