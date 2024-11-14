@@ -43,16 +43,13 @@ pub fn jl_projection(
         let mut row: Vec<RingGoldilock256> = Vec::with_capacity(original_dim);
         for _ in 0..original_dim {
             // generate random polynomial ring with coefficients from the set {-1, 0, 1}
-            let mut poly: Vec<Goldilocks> = Vec::with_capacity(ConfigZZpXGoldilocks256::DIM);
-            for _ in 0..ConfigZZpXGoldilocks256::DIM {
-                let cell = match PiDistribution.sample(&mut rand::thread_rng()) {
-                    -1 => Goldilocks::from(1u64).neg(),
-                    0 => Goldilocks::from(0u64),
-                    1 => Goldilocks::from(1u64),
-                    _ => unreachable!(),
-                };
-                poly.push(cell);
-            }
+            let cell = match PiDistribution.sample(&mut rand::thread_rng()) {
+                -1 => Goldilocks::from(1u64).neg(),
+                0 => Goldilocks::from(0u64),
+                1 => Goldilocks::from(1u64),
+                _ => unreachable!(),
+            };
+            let poly = vec![cell; ConfigZZpXGoldilocks256::DIM];
             row.push(RingGoldilock256::from_coefficients_vec_unchecked(poly));
         }
         projection_matrix.push(row);
