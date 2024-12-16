@@ -1,4 +1,18 @@
 [workspace]
+resolver = "2"
 members = [
     "labrador",
 ]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+
+[workspace.dependencies]
+rand = "0.8"
+rayon = { version = "*"}
+
+# profiler deps
+ark-std = { version = "0.4.0" }
+profiler_macro = { git ="https://github.com/SuccinctPaul/profiler-rs.git", tag = "v0.1.0" }
+

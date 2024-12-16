@@ -1,9 +1,23 @@
 [package]
 name = "labrador"
-version = "0.1.0"
-edition = "2018"
+version = { workspace = true }
+edition = { workspace = true }
 
 [[example]]
 name = "main"
 required_features = ["test"]
 path = "src/example/main.rs"
+
+[dependencies]
+rand = { workspace = true }
+rayon = {workspace = true, optional = true}
+
+profiler_macro = { workspace = true }
+ark-std = { workspace = true, optional = true }
+
+
+
+[features]
+default = ["parallel"]
+parallel = ["rayon"]
+profiler = ["ark-std/print-trace"]
