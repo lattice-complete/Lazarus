@@ -11,27 +11,50 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 150 # Consider increasing timeout
-    strategy:
-      fail-fast: false
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions-rs/toolchain@v1
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@nightly
         with:
-          profile: minimal
-          toolchain: nightly
-          override: true
-          components: clippy
+          toolchain: $(cat rust-toolchain)
+          components: rustfmt, clippy
 
-      - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --all --verbose
+      - name: Compile
+        run: cargo test --no-run
 
       - name: Test
-        run: cargo test --all --verbose
+        run: cargo test --all --verbose --no-fail-fast
+
+  clippy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          toolchain: $(cat rust-toolchain)
+          components: rustfmt, clippy
+
+      - name: Run clippy 
+        run: cargo clippy --all-features --all-targets -- -D warnings
+
+  cargo-fmt:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          toolchain: $(cat rust-toolchain)
+          components: rustfmt, clippy
+
+      - name: Run rustfmt 
+        run: cargo fmt --all --check
