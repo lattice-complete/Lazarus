@@ -42,11 +42,9 @@ impl PolynomialRing {
         // Reduce modulo X^64 + 1
         if result_coefficients.len() > Self::DEGREE_BOUND {
             let modulus_minus_one = Zq::from(Zq::modulus() - 1);
-            for i in Self::DEGREE_BOUND..result_coefficients.len() {
-                let overflow = result_coefficients[i].clone();
-                result_coefficients[i - Self::DEGREE_BOUND] =
-                    result_coefficients[i - Self::DEGREE_BOUND].clone()
-                        + (overflow * modulus_minus_one);
+            let (front, back) = result_coefficients.split_at_mut(Self::DEGREE_BOUND);
+            for (i, &overflow) in back.iter().enumerate() {
+                front[i] += overflow * modulus_minus_one;
             }
             result_coefficients.truncate(Self::DEGREE_BOUND);
         }
