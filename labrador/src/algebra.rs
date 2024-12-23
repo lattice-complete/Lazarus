@@ -56,20 +56,22 @@ impl PolynomialRing {
     }
 
     fn add_polynomial_ring(&self, other: &PolynomialRing) -> PolynomialRing {
-        let max_len = std::cmp::max(self.coefficients.len(), other.coefficients.len());
+        let len_a = self.coefficients.len();
+        let len_b = other.coefficients.len();
+        let max_len = std::cmp::max(len_a, len_b);
         let mut result_coefficients = Vec::with_capacity(max_len);
-        for i in 0..max_len {
-            let a = if i < self.coefficients.len() {
-                self.coefficients[i]
-            } else {
-                Zq::new(0)
-            };
-            let b = if i < other.coefficients.len() {
-                other.coefficients[i]
-            } else {
-                Zq::new(0)
-            };
-            result_coefficients.push(a + b);
+
+        result_coefficients.extend(
+            self.coefficients
+                .iter()
+                .zip(other.coefficients.iter())
+                .map(|(&a, &b)| a + b),
+        );
+
+        if len_a > len_b {
+            result_coefficients.extend_from_slice(&self.coefficients[len_b..]);
+        } else if len_b > len_a {
+            result_coefficients.extend_from_slice(&other.coefficients[len_a..]);
         }
         PolynomialRing {
             coefficients: result_coefficients,
