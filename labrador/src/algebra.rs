@@ -33,9 +33,9 @@ impl PolynomialRing {
         // Initialize a vector to hold the intermediate multiplication result
         let mut result_coefficients =
             vec![Zq::new(0); self.coefficients.len() + other.coefficients.len() - 1];
-        for (i, coeff1) in self.coefficients.iter().enumerate() {
-            for (j, coeff2) in other.coefficients.iter().enumerate() {
-                result_coefficients[i + j] = result_coefficients[i + j] + (*coeff1 * *coeff2);
+        for (i, &coeff1) in self.coefficients.iter().enumerate() {
+            for (j, &coeff2) in other.coefficients.iter().enumerate() {
+                result_coefficients[i + j] += coeff1 * coeff2;
             }
         }
 
