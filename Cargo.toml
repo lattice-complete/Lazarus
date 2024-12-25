@@ -10,7 +10,7 @@ edition = "2021"
 
 [workspace.dependencies]
 rand = "0.8"
-rayon = { version = "*"}
+rayon = "1.10.0"
 
 # profiler deps
 ark-std = { version = "0.4.0" }

@@ -15,7 +15,8 @@ rayon = {workspace = true, optional = true}
 profiler_macro = { workspace = true }
 ark-std = { workspace = true, optional = true }
 
-
+[dev-dependencies]
+cargo-husky = { version = "1.5.0", default-features = false, features = ["prepush-hook", "run-cargo-fmt", "run-cargo-check"] }
 
 [features]
 default = ["parallel"]
