@@ -1,6 +1,4 @@
-pub mod core;
+pub mod algebra;
 pub mod prover;
 pub mod setup;
-pub mod statement;
-pub mod transcript;
 pub mod verifier;

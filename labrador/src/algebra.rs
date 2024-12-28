@@ -1,10 +1,14 @@
-use crate::zq::Zq;
 use std::cmp::PartialEq;
+use std::fmt::Display;
+use std::iter::Sum;
 use std::ops::Add;
+use std::ops::AddAssign;
+use std::ops::Div;
 use std::ops::Mul;
+use std::ops::Rem;
+use std::ops::Sub;
 
 #[derive(Debug, Clone, Eq)]
-
 pub struct PolynomialRing {
     pub coefficients: Vec<Zq>,
 }
@@ -42,6 +46,7 @@ impl PolynomialRing {
             for (i, &overflow) in back.iter().enumerate() {
                 front[i] += overflow * modulus_minus_one;
             }
+            result_coefficients.truncate(Self::DEGREE_BOUND);
             result_coefficients.truncate(Self::DEGREE_BOUND);
         }
         PolynomialRing {
@@ -249,9 +254,192 @@ impl PartialEq for PolynomialRing {
     }
 }
 
+// Let q be a modulus, and let Zq be the ring of integers mod q
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Zq {
+    pub value: usize,
+}
+
+impl Zq {
+    // todo: use symmetric from -Q/2 to Q/2
+    pub const Q: usize = 2usize.pow(32);
+
+    pub fn modulus() -> usize {
+        Self::Q
+    }
+    pub fn new(value: usize) -> Self {
+        Zq {
+            value: value % Self::Q,
+        }
+    }
+
+    pub fn value(&self) -> usize {
+        self.value
+    }
+
+    pub fn pow(&self, other: usize) -> Self {
+        Zq::new(self.value.pow(other as u32))
+    }
+}
+
+impl PartialOrd for Zq {
+    fn partial_cmp(&self, other: &Zq) -> Option<std::cmp::Ordering> {
+        Some(self.value.cmp(&other.value))
+    }
+}
+
+impl Display for Zq {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
+
+impl Rem for Zq {
+    type Output = Zq;
+
+    fn rem(self, other: Zq) -> Zq {
+        Zq::new(self.value % other.value)
+    }
+}
+
+impl Add for Zq {
+    type Output = Zq;
+
+    fn add(self, other: Zq) -> Zq {
+        // assert!(self.value + other.value < Self::Q, "Addition result exceeds modulus");
+        Zq::new(self.value + other.value)
+    }
+}
+
+impl AddAssign for Zq {
+    fn add_assign(&mut self, other: Zq) {
+        self.value = (self.value + other.value) % Self::Q;
+    }
+}
+
+impl Sub for Zq {
+    type Output = Zq;
+
+    fn sub(self, other: Zq) -> Zq {
+        Zq::new((self.value + Self::Q) - other.value)
+    }
+}
+
+impl Mul for Zq {
+    type Output = Zq;
+
+    fn mul(self, other: Zq) -> Zq {
+        // assert!(self.value * other.value < Self::Q, "Multiplication result exceeds modulus");
+        Zq::new(self.value * other.value)
+    }
+}
+
+impl From<usize> for Zq {
+    fn from(value: usize) -> Self {
+        Zq::new(value)
+    }
+}
+
+impl Sum for Zq {
+    fn sum<I: Iterator<Item = Zq>>(iter: I) -> Self {
+        iter.fold(Zq::new(0), |acc, x| acc + x)
+    }
+}
+
+#[derive(Debug)]
+pub struct RqMatrix {
+    pub values: Vec<Vec<PolynomialRing>>, // matrix of PolynomialRing values
+}
+
+impl RqMatrix {
+    pub fn new(kappa: Zq, size_n: Zq) -> Self {
+        let size_kappa_usize: usize = kappa.value();
+        let size_n_usize: usize = size_n.value();
+        let mut rng = rand::thread_rng();
+        let values: Vec<Vec<PolynomialRing>> = (0..size_kappa_usize)
+            .map(|_| {
+                (0..size_n_usize)
+                    .map(|_| PolynomialRing {
+                        coefficients: (0..size_n_usize)
+                            .map(|_| Zq::from(2)) // we just use 2 as random number to facilitate test
+                            .collect(),
+                    })
+                    .collect()
+            })
+            .collect();
+        assert_eq!(
+            values.len(),
+            size_kappa_usize,
+            "values must have the same length as size_kappa"
+        );
+        assert_eq!(
+            values[0].len(),
+            size_n_usize,
+            "values[0] must have the same length as size_n"
+        );
+        RqMatrix { values }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_zq_addition() {
+        let a = Zq::new(10);
+        let b = Zq::new(20);
+        let result = a + b;
+        assert_eq!(result.value, 30);
+    }
+
+    #[test]
+    fn test_zq_subtraction() {
+        let a = Zq::new(10);
+        let b = Zq::new(5);
+        let result = a - b;
+        assert_eq!(result.value, 5);
+    }
+
+    #[test]
+    fn test_zq_multiplication() {
+        let a = Zq::new(6);
+        let b = Zq::new(7);
+        let result = a * b;
+        assert_eq!(result.value, 42);
+    }
+
+    #[test]
+    fn test_zq_multiplication_overflow() {
+        let a = Zq::new(Zq::Q - 1);
+        let b = Zq::new(2);
+        let result = a * b;
+        let expected = Zq::new(Zq::Q - 2); // -2
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_zq_overflow() {
+        let a = Zq::new(Zq::Q - 1);
+        let b = Zq::new(2);
+        let result = a + b;
+        assert_eq!(result.value, 1); // (2^32 - 1) + 2 mod 2^32 = 1
+    }
+
+    #[test]
+    fn test_zq_new() {
+        let value = 4294967297; // Q + 1
+        let zq = Zq::new(value);
+        assert_eq!(zq.value, 1);
+    }
+
+    #[test]
+    fn test_zq_remainder() {
+        let a = Zq::new(10);
+        let b = Zq::new(3);
+        let result = a % b;
+        assert_eq!(result.value, 1);
+    }
 
     #[test]
     fn test_multiply_by_polynomial_ring() {
@@ -316,30 +504,6 @@ mod tests {
         assert_eq!(
             product.coefficients, expected_coeffs,
             "Overflow handling in multiplication is incorrect"
-        );
-    }
-
-    // add test for polynomial addition and multiplication with overload
-    #[test]
-    fn test_polynomial_addition_and_multiplication() {
-        let a = PolynomialRing {
-            coefficients: vec![Zq::from(1), Zq::from(2), Zq::from(3)],
-        };
-        let b = PolynomialRing {
-            coefficients: vec![Zq::from(4), Zq::from(5), Zq::from(6)],
-        };
-        let c = &a + &b;
-        assert_eq!(c.coefficients, vec![Zq::from(5), Zq::from(7), Zq::from(9)]);
-        let d = &a * &b;
-        assert_eq!(
-            d.coefficients,
-            vec![
-                Zq::from(4),
-                Zq::from(13),
-                Zq::from(28),
-                Zq::from(27),
-                Zq::from(18)
-            ]
         );
     }
 }

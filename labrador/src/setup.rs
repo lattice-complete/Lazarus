@@ -1,4 +1,5 @@
-use algebra::{rq_matrix::RqMatrix, zq::Zq};
+use crate::algebra::RqMatrix;
+use crate::algebra::Zq;
 
 type RqMatrix2D = Vec<Vec<RqMatrix>>;
 type RqMatrix3D = Vec<Vec<Vec<RqMatrix>>>;
