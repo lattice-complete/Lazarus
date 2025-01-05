@@ -26,11 +26,11 @@ impl Zq {
         }
     }
 
-    pub fn value(&self) -> usize {
+    pub fn value(self) -> usize {
         self.value
     }
 
-    pub fn pow(&self, other: usize) -> Self {
+    pub fn pow(self, other: usize) -> Self {
         Zq::new(self.value.pow(other as u32))
     }
 
