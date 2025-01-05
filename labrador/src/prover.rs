@@ -296,7 +296,7 @@ pub fn prove(
     // 4. GOAL: Aggregation
     // 4.1 psi^(k) is randomly chosen from Z_q^{L}
     // k = 1..λ/log2^q
-    let size_k = Zq::new(lambda.value() / log_q.value());
+    let size_k = lambda.ceil_div(log_q);
     let psi: Vec<Vec<Zq>> = (0..size_k.value())
         .map(|_| {
             (0..constraint_num_l.value())

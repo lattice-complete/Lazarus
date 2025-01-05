@@ -33,6 +33,10 @@ impl Zq {
     pub fn pow(&self, other: usize) -> Self {
         Zq::new(self.value.pow(other as u32))
     }
+
+    pub fn ceil_div(self, other: Zq) -> Zq {
+        Zq::new((self.value + other.value - 1) / other.value)
+    }
 }
 
 impl PartialOrd for Zq {
@@ -155,5 +159,18 @@ mod tests {
         let b = Zq::new(3);
         let result = a % b;
         assert_eq!(result.value, 1);
+    }
+
+    #[test]
+    fn test_zq_ceil_div() {
+        let mut a;
+        let mut b;
+        a = Zq::new(10);
+        b = Zq::new(3);
+        assert_eq!(a.ceil_div(b).value(), 4);
+
+        a = Zq::new(9);
+        b = Zq::new(3);
+        assert_eq!(a.ceil_div(b).value(), 3);
     }
 }
