@@ -34,7 +34,9 @@ impl Zq {
         Zq::new(self.value.pow(other as u32))
     }
 
-    pub fn ceil_div(self, other: Zq) -> Zq {
+    // bypass clippy for now as we'll implement Zq in isize/i64 (no div_ceil function supported) later
+    #[allow(clippy::manual_div_ceil)]
+    pub fn div_ceil(self, other: Zq) -> Zq {
         Zq::new((self.value + other.value - 1) / other.value)
     }
 }
@@ -167,10 +169,10 @@ mod tests {
         let mut b;
         a = Zq::new(10);
         b = Zq::new(3);
-        assert_eq!(a.ceil_div(b).value(), 4);
+        assert_eq!(a.div_ceil(b).value(), 4);
 
         a = Zq::new(9);
         b = Zq::new(3);
-        assert_eq!(a.ceil_div(b).value(), 3);
+        assert_eq!(a.div_ceil(b).value(), 3);
     }
 }
