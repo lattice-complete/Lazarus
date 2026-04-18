@@ -319,6 +319,42 @@ mod tests {
         );
     }
 
+    /// Regression test for the LaBRADOR ring-bug write-up (against commit d752488).
+    ///
+    /// With the buggy modulus q = 2^32, choosing u with every coefficient = 2^31
+    /// makes u·α = 0 in R = Zq[X]/(X^64+1) with probability 1/2 over uniform α
+    /// (2^31 is a zero divisor), reducing protocol soundness to 1 bit. With q
+    /// prime, Zq is a field and α·u = 0 forces α = 0 — vanishingly rare. This
+    /// guards against any future regression that swaps q back to a power of two.
+    #[test]
+    fn ring_bug_regression_zero_divisor() {
+        use rand::Rng;
+        let mut rng = rand::thread_rng();
+
+        let u = PolynomialRing {
+            coefficients: vec![Zq::from(1usize << 31); PolynomialRing::DEGREE_BOUND],
+        };
+
+        const TRIALS: usize = 1_000;
+        let mut zero_products = 0;
+        for _ in 0..TRIALS {
+            let alpha = PolynomialRing {
+                coefficients: (0..PolynomialRing::DEGREE_BOUND)
+                    .map(|_| Zq::from(rng.gen_range(0..Zq::Q)))
+                    .collect(),
+            };
+            if (&alpha * &u).coefficients.iter().all(|c| c.value() == 0) {
+                zero_products += 1;
+            }
+        }
+
+        assert_eq!(
+            zero_products, 0,
+            "ring bug regression: u = (2^31, …, 2^31) collided with random α \
+             {zero_products}/{TRIALS} times — q must be prime, not a power of 2"
+        );
+    }
+
     // add test for polynomial addition and multiplication with overload
     #[test]
     fn test_polynomial_addition_and_multiplication() {

@@ -18,6 +18,7 @@ use profiler_macro::time_profiler;
 use rand::Rng;
 
 #[time_profiler]
+#[allow(clippy::needless_range_loop)] // formulas index parallel arrays g[i][j], h[i][j], pai[i][j]; iterators obscure the math
 pub fn prove(
     a_matrix: &RqMatrix,
     b_matrix: &[Vec<RqMatrix>],

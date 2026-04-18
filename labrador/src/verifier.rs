@@ -12,6 +12,7 @@ use profiler_macro::time_profiler;
 // [u1, p, b^{''(k)},u2, z, t_i, g_ij, h_ij]
 
 #[time_profiler]
+#[allow(clippy::needless_range_loop)] // formulas index parallel arrays g[i][j], h[i][j]; iterators obscure the math
 pub fn verify(
     st: Statement,
     tr: Transcript,

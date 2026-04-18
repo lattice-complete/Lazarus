@@ -9,6 +9,7 @@ use algebra::{PolynomialRing, RqMatrix, Zq};
 // Initialize u1 with zeros with size kappa1, each element is a polynomial ring
 // TODO(junochiu): to check if it make sense to solve the too many argument issue
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::needless_range_loop)] // triple-indexed math c_matrix[i][j][k] · g_ij^(k); iterators obscure the formula
 pub fn calculate_outer_comm_u1(
     b_matrix: &[Vec<RqMatrix>],
     c_matrix: &[Vec<Vec<RqMatrix>>],

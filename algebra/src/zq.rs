@@ -15,7 +15,9 @@ pub struct Zq {
 
 impl Zq {
     // todo: use symmetric from -Q/2 to Q/2
-    pub const Q: usize = 2usize.pow(32);
+    // q = 2^32 - 99 = 4_294_967_197, the prime modulus used by the LaBRADOR reference
+    // implementation (lattice-dogs/labrador, data32.c: LOGQ=32, QOFF=99).
+    pub const Q: usize = (1usize << 32) - 99;
 
     pub fn modulus() -> usize {
         Self::Q
@@ -150,7 +152,7 @@ mod tests {
 
     #[test]
     fn test_zq_new() {
-        let value = 4294967297; // Q + 1
+        let value = Zq::Q + 1;
         let zq = Zq::new(value);
         assert_eq!(zq.value, 1);
     }
