@@ -1,0 +1,10 @@
+[package]
+name = "greyhound"
+version = { workspace = true }
+edition = { workspace = true }
+description = "Greyhound polynomial commitment scheme (Nguyen-Seiler 2024) over the Lazarus algebra layer, compressed with the labrador proof system"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+algebra = { path = "../algebra" }
+labrador = { path = "../labrador" }

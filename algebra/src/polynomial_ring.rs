@@ -23,9 +23,20 @@ impl PolynomialRing {
         }
     }
 
-    // todo: use NTT to speed up
     // Multiply two polynomials in R = Zq[X]/(X^64 + 1)
     fn multiply_by_polynomial_ring(&self, other: &PolynomialRing) -> PolynomialRing {
+        // Fast path: full-degree operands go through the CRT/NTT engine.
+        // (Legacy semantics for shorter operands — an untruncated result of
+        // length la + lb - 1 — are preserved by the schoolbook path below.)
+        const _: () = assert!(PolynomialRing::DEGREE_BOUND == 64);
+        if self.coefficients.len() == Self::DEGREE_BOUND
+            && other.coefficients.len() == Self::DEGREE_BOUND
+        {
+            let a = crate::ring::Poly::<64>::from(self);
+            let b = crate::ring::Poly::<64>::from(other);
+            return PolynomialRing::from(&a.mul_ntt(&b));
+        }
+
         // Initialize a vector to hold the intermediate multiplication result
         let mut result_coefficients =
             vec![Zq::new(0); self.coefficients.len() + other.coefficients.len() - 1];

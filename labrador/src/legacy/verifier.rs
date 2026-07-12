@@ -1,7 +1,7 @@
 // src/verifier.rs
-use crate::core::{aggregation::*, decompose::*, norm::*, outer_commitment::*};
-use crate::statement::Statement;
-use crate::transcript::Transcript;
+use crate::legacy::core::{aggregation::*, decompose::*, norm::*, outer_commitment::*};
+use crate::legacy::statement::Statement;
+use crate::legacy::transcript::Transcript;
 use algebra::{polynomial_ring::PolynomialRing, rq_matrix::RqMatrix, utils::*, zq::Zq};
 use profiler_macro::time_profiler;
 

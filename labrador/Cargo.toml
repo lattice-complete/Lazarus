@@ -6,12 +6,13 @@ edition = { workspace = true }
 [[example]]
 name = "main"
 required_features = ["test"]
-path = "src/example/main.rs"
+path = "src/legacy/example/main.rs"
 
 [dependencies]
 rand = { workspace = true }
 rayon = {workspace = true, optional = true}
 algebra = { path = '../algebra' }
+sha3 = { workspace = true }
 
 profiler_macro = { workspace = true }
 ark-std = { workspace = true, optional = true }

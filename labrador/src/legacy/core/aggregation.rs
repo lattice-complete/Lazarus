@@ -1,4 +1,4 @@
-use crate::core::conjugation_automorphism::conjugation_automorphism;
+use crate::legacy::core::conjugation_automorphism::conjugation_automorphism;
 use algebra::{inner_product_polynomial_ring_vector, zero_poly, PolynomialRing, Zq};
 
 // 4.3.1 aggregation: calculate a_ij^{''(k)} = sum(psi_l^(k) * a_ij^{'(l)}) for all l = 1..L
@@ -309,7 +309,7 @@ pub fn check_aggr_relation(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::{
+    use crate::legacy::core::{
         constraint::calculate_b_constraint, gaussian_generator::generate_gaussian_distribution,
     };
     use algebra::utils::generate_random_polynomial_ring;

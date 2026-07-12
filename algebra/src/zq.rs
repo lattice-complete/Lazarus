@@ -7,6 +7,10 @@ use std::ops::Mul;
 use std::ops::Rem;
 use std::ops::Sub;
 
+// The arithmetic below relies on usize being 64 bits wide so that products of
+// two values < q < 2^32 never overflow ((q-1)^2 < 2^64).
+const _: () = assert!(usize::BITS >= 64, "algebra::zq requires a 64-bit target");
+
 // Let q be a modulus, and let Zq be the ring of integers mod q
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Zq {
@@ -32,8 +36,54 @@ impl Zq {
         self.value
     }
 
-    pub fn pow(self, other: usize) -> Self {
-        Zq::new(self.value.pow(other as u32))
+    /// Modular exponentiation by square-and-multiply.
+    ///
+    /// (The previous implementation computed `self.value.pow(e)` in machine
+    /// integers, which overflows for virtually every non-trivial input.)
+    pub fn pow(self, mut exp: usize) -> Self {
+        let mut base = self.value as u128;
+        let q = Self::Q as u128;
+        let mut acc: u128 = 1;
+        base %= q;
+        while exp > 0 {
+            if exp & 1 == 1 {
+                acc = acc * base % q;
+            }
+            base = base * base % q;
+            exp >>= 1;
+        }
+        Zq {
+            value: acc as usize,
+        }
+    }
+
+    /// Multiplicative inverse. q is prime, so a^(q-2) = a^{-1} (Fermat).
+    ///
+    /// Panics on zero.
+    pub fn inv(self) -> Self {
+        assert!(self.value != 0, "Zq::inv: zero has no inverse");
+        self.pow(Self::Q - 2)
+    }
+
+    /// Centered (symmetric) representative in (-q/2, q/2].
+    pub fn centered(self) -> i64 {
+        let v = self.value as i64;
+        let q = Self::Q as i64;
+        if v > q / 2 {
+            v - q
+        } else {
+            v
+        }
+    }
+
+    /// Build an element from a (possibly negative) integer.
+    pub fn from_i64(v: i64) -> Self {
+        let q = Self::Q as i64;
+        let mut r = v % q;
+        if r < 0 {
+            r += q;
+        }
+        Zq { value: r as usize }
     }
 
     // bypass clippy for now as we'll implement Zq in isize/i64 (no div_ceil function supported) later
@@ -82,6 +132,21 @@ impl Sub for Zq {
 
     fn sub(self, other: Zq) -> Zq {
         Zq::new((self.value + Self::Q) - other.value)
+    }
+}
+
+impl std::ops::Neg for Zq {
+    type Output = Zq;
+
+    /// Additive inverse.
+    fn neg(self) -> Zq {
+        if self.value == 0 {
+            self
+        } else {
+            Zq {
+                value: Self::Q - self.value,
+            }
+        }
     }
 }
 
@@ -163,6 +228,33 @@ mod tests {
         let b = Zq::new(3);
         let result = a % b;
         assert_eq!(result.value, 1);
+    }
+
+    #[test]
+    fn test_zq_pow_large_exponent_no_overflow() {
+        // (q-1)^2 mod q = 1, and generally pow must not overflow machine ints.
+        let a = Zq::new(Zq::Q - 1); // -1 mod q
+        assert_eq!(a.pow(2).value(), 1);
+        assert_eq!(a.pow(3), a);
+        // Fermat: a^(q-1) = 1 for a != 0
+        let b = Zq::new(123456789);
+        assert_eq!(b.pow(Zq::Q - 1).value(), 1);
+    }
+
+    #[test]
+    fn test_zq_inv() {
+        for v in [1usize, 2, 99, 1 << 31, Zq::Q - 1] {
+            let a = Zq::new(v);
+            assert_eq!((a * a.inv()).value(), 1, "inv failed for {v}");
+        }
+    }
+
+    #[test]
+    fn test_zq_centered_roundtrip() {
+        for v in [0i64, 1, -1, (Zq::Q as i64 - 1) / 2, -(Zq::Q as i64) / 2] {
+            assert_eq!(Zq::from_i64(v).centered(), v, "centered failed for {v}");
+        }
+        assert_eq!(Zq::new(Zq::Q - 1).centered(), -1);
     }
 
     #[test]

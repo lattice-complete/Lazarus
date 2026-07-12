@@ -2,7 +2,8 @@
 resolver = "2"
 members = [
     "labrador",
-    "algebra"
+    "algebra",
+    "greyhound"
 ]
 
 [workspace.package]
@@ -12,6 +13,11 @@ edition = "2021"
 [workspace.dependencies]
 rand = "0.8"
 rayon = "1.10.0"
+
+# RNG / hashing backends for the sampling layer (RustCrypto, pure Rust)
+sha3 = "0.10"
+aes = "0.8"
+ctr = "0.9"
 
 # profiler deps
 ark-std = { version = "0.4.0" }

@@ -1,9 +1,9 @@
-use crate::core::{
+use crate::legacy::core::{
     aggregation::*, conjugation_automorphism::conjugation_automorphism, constraint::*,
     decompose::*, gaussian_generator::generate_gaussian_distribution, norm::*, outer_commitment::*,
 };
-use crate::statement::Statement;
-use crate::transcript::Transcript;
+use crate::legacy::statement::Statement;
+use crate::legacy::transcript::Transcript;
 use algebra::{
     polynomial_ring::PolynomialRing,
     rq_matrix::RqMatrix,
@@ -521,8 +521,8 @@ pub fn prove(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::setup::setup;
-    use crate::verifier::verify;
+    use crate::legacy::setup::setup;
+    use crate::legacy::verifier::verify;
     use std::vec;
 
     #[test]

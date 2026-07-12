@@ -35,11 +35,25 @@ Lazarus is a framework for implementing lattice-based zero-knowledge arguments i
 
 
 ## Roadmap
-- [ ] Implementing polynomial commitment schemes
-- [ ] Implementing zero-knowledge proofs for linear relations
-- [ ] Implementing sigma protocols for lattice statements
-- [ ] Optimized polynomial operations
-- [ ] Serialization/deserialization support
+- [x] Foundation layer ported from the lazer/labrador C libraries — modular
+  `Zq`/`Rq` arithmetic (`Poly<D>`/`PolyVec`/`PolyMat`), CRT/NTT multiplication,
+  deterministic domain-separated RNG (SHAKE128 / AES256-CTR), uniform / CBD /
+  discrete-Gaussian / rejection samplers. See [docs/MIGRATION.md](./docs/MIGRATION.md)
+  for the C-to-Rust map, design notes and verification status.
+- [x] LaBRADOR proof system (`labrador` crate): principal sparse dot-product
+  constraint statements, single-round reduction (Ajtai commitments, modular
+  Johnson–Lindenstrauss projection, Z_q-constraint lifting, constraint
+  aggregation, amortization), automatic per-round parameter search with MSIS
+  security estimation, full recursive self-folding with tail rounds
+  (`composite_prove` / `composite_verify`).
+- [x] Greyhound polynomial commitment scheme (`greyhound` crate): two-tier
+  Ajtai commitment, evaluation proofs, reduction of the verification
+  relation to a labrador principal statement, compressed with the recursive
+  chain.
+- [ ] Proof serialization / entropy coding (C: `codec*.c`)
+- [ ] Dachshund binary-R1CS front end (needs the quadratic==2 witness mode)
+- [ ] LNP toolbox layer from lazer (`abdlop`, `lnp-quad*`, `lnp-tbox`)
+- [ ] Optimized polynomial operations (SIMD feature flags; NTT engine is in)
 
 ## Getting Started
 
